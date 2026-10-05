@@ -1,0 +1,272 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Optom Product Osh — каталог</title>
+<meta name="description" content="Optom Product Osh — продукты оптом и в розницу.">
+<link rel="stylesheet" href="/static/shop/css/style.css">
+</head>
+<body>
+
+
+<!-- =========================
+     HEADER
+========================= -->
+
+<header>
+
+    <div class="header-inner">
+
+        <a href="#" class="logo">
+
+            <div class="logo-icon">
+                🛒
+            </div>
+
+            <div class="logo-text">
+                <strong>OPTOM PRODUCT</strong>
+                <span>OSН • Продукты оптом и в розницу</span>
+            </div>
+
+        </a>
+
+        <div class="search">
+
+            <span class="search-icon">🔍</span>
+
+            <input
+                type="text"
+                id="searchInput"
+                placeholder="Поиск товара..."
+            >
+
+        </div>
+
+        <button
+            class="cart-button"
+            onclick="openCart()"
+        >
+
+            🛒
+
+            <span>Корзина</span>
+
+            <span id="cartCount">0</span>
+
+        </button>
+
+    </div>
+
+</header>
+
+
+<!-- =========================
+     HERO
+========================= -->
+
+<section class="hero">
+
+    <div class="hero-box">
+
+        <div class="hero-content">
+
+            <div class="hero-badge">
+                🥦 Свежие продукты каждый день
+            </div>
+
+            <h1>
+                Всё необходимое<br>
+                в одной корзине
+            </h1>
+
+            <p>
+                Выбирайте продукты, добавляйте их в корзину
+                и отправляйте готовый заказ прямо в WhatsApp.
+                Быстро, удобно и без лишних звонков.
+            </p>
+
+        </div>
+
+        <div class="hero-decoration"></div>
+
+    </div>
+
+</section>
+
+
+<!-- =========================
+     CATEGORIES
+========================= -->
+
+<section class="categories">
+    <div class="category-list" id="categoryList">
+        <button class="category active" data-category="">Все товары</button>
+    </div>
+</section>
+
+
+<!-- =========================
+     PRODUCTS
+========================= -->
+
+<section class="products-section">
+
+    <div class="section-header">
+
+        <h2>Каталог товаров</h2>
+
+        <span
+            class="products-count"
+            id="productsCount"
+        >
+            12 товаров
+        </span>
+
+    </div>
+
+
+    <div
+        class="products"
+        id="products"
+    ></div>
+
+</section>
+
+
+<!-- =========================
+     CART
+========================= -->
+
+<div
+    class="cart-overlay"
+    id="cartOverlay"
+    onclick="overlayClick(event)"
+>
+
+    <aside class="cart">
+
+        <div class="cart-header">
+
+            <h3>
+                🛒 Ваша корзина
+            </h3>
+
+            <button
+                class="close-cart"
+                onclick="closeCart()"
+            >
+                ×
+            </button>
+
+        </div>
+
+
+        <div
+            class="cart-items"
+            id="cartItems"
+        >
+
+            <div class="empty-cart">
+
+                <div>
+
+                    <div class="empty-icon">
+                        🛒
+                    </div>
+
+                    <strong>
+                        Корзина пока пустая
+                    </strong>
+
+                    <p style="margin-top:8px;">
+                        Добавьте товары из каталога,
+                        чтобы оформить заказ.
+                    </p>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <div class="cart-footer">
+
+            <div class="total">
+
+                <span>
+                    Итого
+                </span>
+
+                <strong id="total">
+                    0 сом
+                </strong>
+
+            </div>
+
+
+            <button
+                class="order-btn"
+                id="orderBtn"
+                onclick="orderWhatsApp()"
+                disabled
+            >
+                <span>WhatsApp</span>
+                Заказать
+            </button>
+
+        </div>
+
+    </aside>
+
+</div>
+
+
+<div class="product-modal-overlay" id="productModal" onclick="if(event.target===this)closeProductModal()">
+  <div class="product-modal">
+    <button class="product-modal-close" onclick="closeProductModal()">×</button>
+    <img id="productModalImage" class="product-modal-image" src="" alt="">
+    <h3 id="productModalTitle"></h3>
+    <div class="price-choice">
+      <label class="price-choice-item"><input id="retailRadio" type="radio" name="priceType" value="retail" checked><span id="retailChoice"></span></label>
+      <label class="price-choice-item"><input id="wholesaleRadio" type="radio" name="priceType" value="wholesale"><span id="wholesaleChoice"></span></label>
+    </div>
+    <div id="packageInfo" class="package-info" style="display:none;margin-top:14px;"></div>
+    <div class="modal-quantity"><button type="button" onclick="changeModalQty(-1)">−</button><input id="productModalQty" type="number" min="1" value="1"><button type="button" onclick="changeModalQty(1)">+</button></div>
+    <div id="productModalError" class="checkout-error"></div>
+    <button class="order-btn" type="button" onclick="addSelectedToCart()">Добавить в корзину</button>
+  </div>
+</div>
+
+<div class="checkout-overlay" id="checkoutOverlay">
+  <div class="checkout">
+    <div class="cart-header"><h3>Оформление заказа</h3><button class="close-cart" onclick="closeCheckout()">×</button></div>
+    <form id="checkoutForm">
+      {% csrf_token %}
+      <label>Имя<input name="customer_name" required maxlength="150" placeholder="Ваше имя"></label>
+      <label>Телефон<input name="phone" required maxlength="50" placeholder="+996 ..."></label>
+      <label>Адрес доставки<input name="address" maxlength="500" placeholder="Город, улица, дом"></label>
+      <label>Комментарий<textarea name="comment" rows="3" placeholder="Комментарий к заказу"></textarea></label>
+      <div id="checkoutError" class="checkout-error"></div>
+      <button class="order-btn" type="submit"><span>WhatsApp</span> Подтвердить и отправить</button>
+    </form>
+  </div>
+</div>
+
+<!-- =========================
+     TOAST
+========================= -->
+
+<div
+    class="toast"
+    id="toast"
+></div>
+
+
+
+
+
+<script src="/static/shop/js/app.js?v=6"></script>
+</body>
+</html>
